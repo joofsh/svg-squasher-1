@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  p#score Current Score:
+    span {{score}}
+  p#score Timer:
+    span {{timer.show_clock()}} sec
+  .btn.btn-default.btn-primary(ng-click='start_game()', ng-show='game.interval === null') Start Game
+  .btn.btn-default.btn-warning(ng-click='pause_game()', ng-hide='game.interval === null') Pause
+  #game-grid
+    div(ng-repeat='bug in game.bugs')
+      debugger
+      .bug('ng-bug'='', color='{{bug.color}}', speed='{{bug.speed}}', id='{{$$hashKey}}')
