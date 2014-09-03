@@ -1,0 +1,58 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+#score {
+  display: inline-block;
+}
+#score span {
+  margin-left: 5px;
+  font-weight: bold;
+  font-size: 18px;
+}
+li {
+  text-align: left;
+  font-size: 22px;
+}
+h1,
+h3 {
+  text-align: center;
+}
+.rules .btn {
+  margin-left: 43%;
+}
+.buttons-bar {
+  min-height: 35px;
+}
+#timer span {
+  margin-left: 5px;
+}
+#game-grid {
+  position: relative;
+  margin-top: 5px;
+  width: 1200px;
+  height: 500px;
+  background-color: #d3d3d3;
+  border: 2px solid #000;
+}
+.bug {
+  position: relative;
+}
+.bug svg {
+  overflow: overlay;
+}
+.slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: 2s;
+}
+form {
+  text-align: center;
+}
+.green {
+  color: #008000;
+}
