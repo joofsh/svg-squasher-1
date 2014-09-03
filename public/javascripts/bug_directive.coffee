@@ -19,7 +19,15 @@
         for prop in properties
           $(ele).attr(prop, $(ele).attr(prop)*attrs.ratio) if ele.hasOwnProperty(prop)
 
-
-    post: (scope, element, attrs) ->
-
 ]
+
+
+@app.directive "socketSubmit", ->
+  controller: ($scope, $element, $attrs, $location) ->
+    $($element).submit ->
+      $scope.user.name = $($element).find('input').val()
+      socket.emit 'new_top_score',
+        {name: $scope.user.name,
+        score: $scope.user.score}
+      $scope.$apply $location.path('/game_over')
+
