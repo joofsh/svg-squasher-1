@@ -4,8 +4,12 @@ html(ng-app='BugApp')
     title= title
     script(src='/bower_components/jquery/dist/jquery.js')
     script(src='/bower_components/angular/angular.js')
+    script(src='/bower_components/angular-route/angular-route.min.js')
+    script(src='/socket.io/socket.io.js')
+
     script(src='/javascripts/bug_app.js')
     script(src='/javascripts/bug_directive.js')
+
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body(ng-controller='GameCtrl')
