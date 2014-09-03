@@ -1,0 +1,12 @@
+h1 Welcome to SVG Squasher
+.container-fluid
+  .row
+    .col-md-8.col-md-offset-2.rules
+      h3 Here are the rules:
+      ol
+        li Click on the bugs to kill them and gain points
+        li As the game continues, the bugs get smaller and faster
+        li If one bug reaches the other side, you lose!
+
+      .btn.btn-default.btn-lg.btn-primary(ng-click='initial_game_start()', ng-show='timer.interval === null') Start Game
+

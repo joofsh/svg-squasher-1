@@ -1,0 +1,3 @@
+div(ng-repeat='bug in game.bugs')
+  .bug.slide('ng-bug'='', color='{{bug.color}}', ratio='{{bug.ratio}}',
+  ng-style='game.bug_position(bug.lat, bug.long)', ng-click='kill_bug(bug)')

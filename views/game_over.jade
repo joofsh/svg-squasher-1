@@ -1,0 +1,11 @@
+h1 Game Over!
+h3 Your final score: {{user.score}}
+h3 Top Scores:
+
+.container-fluid
+  .row
+    .col-md-6.col-md-offset-5
+      ol
+        li(ng-repeat='user in users.top_scores', ng-class='{green: users.green_class(user)}')
+          span {{user.name}}: {{user.score}}
+      .btn.btn-primary.btn-lg(ng-click="restart_game()") Play Again
