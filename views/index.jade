@@ -4,12 +4,12 @@ block content
   h1= title
   p Welcome to #{title}
   p#score Current Score:
-    span {{score}}
+    span {{game.score}}
   p#score Timer:
     span {{timer.show_clock()}} sec
-  .btn.btn-default.btn-primary(ng-click='start_game()', ng-show='game.interval === null') Start Game
-  .btn.btn-default.btn-warning(ng-click='pause_game()', ng-hide='game.interval === null') Pause
+  .btn.btn-default.btn-primary(ng-click='start_game()', ng-show='timer.interval === null') Start Game
+  .btn.btn-default.btn-warning(ng-click='pause_game()', ng-hide='timer.interval === null') Pause
   #game-grid
     div(ng-repeat='bug in game.bugs')
-      debugger
-      .bug('ng-bug'='', color='{{bug.color}}', speed='{{bug.speed}}', id='{{$$hashKey}}')
+      .bug.slide('ng-bug'='', color='{{bug.color}}', ratio='{{bug.ratio}}',
+      ng-style='game.bug_position(bug.lat, bug.long)', ng-click='kill_bug(bug)')
