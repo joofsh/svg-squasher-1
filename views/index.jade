@@ -1,15 +1,14 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
   p#score Current Score:
-    span {{game.score}}
-  p#score Timer:
+    span {{user.score}}
+  p#timer Timer:
     span {{timer.show_clock()}} sec
-  .btn.btn-default.btn-primary(ng-click='start_game()', ng-show='timer.interval === null') Start Game
-  .btn.btn-default.btn-warning(ng-click='pause_game()', ng-hide='timer.interval === null') Pause
+  .buttons-bar
+    .btn.btn-default.btn-primary(ng-click='start_game()', ng-show='timer.interval === null && timer.clock != 0') Start Game
+    .btn.btn-default.btn-warning(ng-click='stop_game()', ng-hide='timer.interval === null') Pause
+    .btn.btn-default.btn-primary(ng-click='restart_game()', ng-show='timer.clock != 0') Restart
   #game-grid
-    div(ng-repeat='bug in game.bugs')
-      .bug.slide('ng-bug'='', color='{{bug.color}}', ratio='{{bug.ratio}}',
-      ng-style='game.bug_position(bug.lat, bug.long)', ng-click='kill_bug(bug)')
+    ng-view
+
