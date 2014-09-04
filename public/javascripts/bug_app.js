@@ -2,15 +2,47 @@
 (function() {
   var Bug, EasyBug, HardBug, MediumBug;
 
-  this.app = angular.module('BugApp', []);
+  this.socket = io();
 
-  this.app.controller('GameCtrl', function($scope, $interval) {
+  this.app = angular.module('BugApp', ['ngRoute']);
+
+  this.app.config([
+    '$routeProvider', function($routeProvider) {
+      return $routeProvider.when('/rules', {
+        templateUrl: '/rules'
+      }).when('/game', {
+        templateUrl: '/game'
+      }).when('/game_over', {
+        templateUrl: '/game_over'
+      }).when('/new_top_score', {
+        templateUrl: '/new_top_score'
+      }).otherwise({
+        redirectTo: '/rules'
+      });
+    }
+  ]);
+
+  this.app.controller('GameCtrl', function($rootScope, $scope, $interval, $location) {
     window.scope = $scope;
+    $scope.users = {
+      green_class: function(user) {
+        return $scope.user.name === user.name;
+      }
+    };
+    $scope.user = {
+      score: 0
+    };
     $scope.game = {
-      interval: null,
-      score: 0,
+      create_bug_interval: null,
+      bug_move_interval: null,
       bug_rate: 2000,
-      bugs: []
+      bugs: [],
+      bug_position: function(lat, long) {
+        return {
+          left: long,
+          top: lat
+        };
+      }
     };
     $scope.timer = {
       clock: 0,
@@ -32,26 +64,66 @@
     };
     $scope.create_bug = function() {
       var bug;
-      if ($scope.timer.clock / 1000 > 120) {
+      if ($scope.timer.clock / 1000 > 60) {
         bug = new HardBug;
-      } else if ($scope.timer.clock / 1000 > 60) {
+      } else if ($scope.timer.clock / 1000 > 30) {
         bug = new MediumBug;
       } else {
         bug = new EasyBug;
       }
-      bug.lat = Math.floor((Math.random() * 100) + 1);
+      bug.lat = Math.floor((Math.random() * 420) + 1);
       $scope.game.bugs.push(bug);
       return console.log("created new bug!");
     };
-    $scope.pause_game = function() {
+    $scope.move_to_end_view = function() {
+      if ($scope.user.score > $scope.users.top_scores[$scope.users.top_scores.length - 1].score || $scope.users.top_scores.length < 10) {
+        return $location.path('/new_top_score');
+      } else {
+        return $location.path('/game_over');
+      }
+    };
+    $scope.check_for_game_end = function() {
+      var bug, _i, _len, _ref, _results;
+      _ref = $scope.game.bugs;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        bug = _ref[_i];
+        if (bug.long >= 1080) {
+          console.log("Bug reached the end! Ending game");
+          $scope.stop_game();
+          $scope.game.bugs = [];
+          $scope.move_to_end_view();
+          break;
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+    $scope.restart_game = function() {
+      $scope.stop_game();
+      $scope.game.bugs = [];
+      $scope.timer.clock = 0;
+      $scope.user.score = 0;
+      return $location.path('/rules');
+    };
+    $scope.stop_game = function() {
       if ($scope.timer.interval) {
         $interval.cancel($scope.timer.interval);
       }
-      if ($scope.game.interval) {
-        $interval.cancel($scope.game.interval);
+      if ($scope.game.create_bug_interval) {
+        $interval.cancel($scope.game.create_bug_interval);
       }
-      $scope.game.interval = null;
+      if ($scope.game.bug_move_interval) {
+        $interval.cancel($scope.game.bug_move_interval);
+      }
+      $scope.game.create_bug_interval = null;
+      $scope.game.bug_move_interval = null;
       return $scope.timer.interval = null;
+    };
+    $scope.initial_game_start = function() {
+      $location.path('/game');
+      return $scope.start_game();
     };
     $scope.start_game = function() {
       $scope.timer.offset = Date.now();
@@ -59,17 +131,53 @@
         console.log("running game time interval");
         return $scope.timer.update();
       }, 200);
-      return $scope.game.interval = $interval((function() {
-        var bug, _i, _len, _ref;
+      $scope.game.bug_move_interval = $interval(function() {
+        var bug, _i, _len, _ref, _results;
         _ref = $scope.game.bugs;
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           bug = _ref[_i];
-          bug.move();
+          _results.push(bug.move());
         }
-        return $scope.create_bug();
+        return _results;
+      }, 2000);
+      $scope.set_bug_interval = function(speed) {};
+      $scope.set_bug_interval();
+      return $scope.game.create_bug_interval = $interval((function() {
+        $scope.create_bug();
+        return $scope.check_for_game_end();
       }), $scope.game.bug_rate);
     };
-    return $scope.kill_bug = function() {};
+    $scope.kill_bug = function(bug) {
+      var ind;
+      if ($scope.timer.interval) {
+        ind = $scope.game.bugs.indexOf(bug);
+        $scope.game.bugs.splice(ind, 1);
+        return $scope.user.score += bug.points;
+      }
+    };
+    $scope.set_bug_interval = function() {
+      $interval.cancel($scope.game.create_bug_interval);
+      return $scope.game.create_bug_interval = $interval((function() {}), $scope.game.bug_rate);
+    };
+    $scope.$watch('timer.clock', function(timer) {
+      if (timer === 0) {
+        $location.path('/rules');
+      }
+      if (timer / 1000 > 30) {
+        $scope.game.bug_rate = 1000;
+        return $scope.set_bug_interval();
+      } else if (timer / 1000 > 60) {
+        $scope.game.bug_rate = 500;
+        return $scope.set_bug_interval();
+      } else {
+        return $scope.game.bug_rate = 2000;
+      }
+    });
+    return socket.on('top_scores', function(top_scores) {
+      console.log('top scores received from server');
+      return $scope.$apply($scope.users.top_scores = top_scores);
+    });
   });
 
   Bug = {
@@ -77,7 +185,10 @@
     long: 0.0,
     move: function() {
       this.long = this.long + this.speed;
-      this.lat = this.lat + Math.floor((Math.random() * this.speed) + 1);
+      this.lat = Math.floor(Math.random() * 400) + 1;
+      if (this.long > 1100) {
+        this.long = 1100;
+      }
       return console.log("moving bug to " + this.long + " long and " + this.lat + " lat");
     }
   };
@@ -85,7 +196,9 @@
   EasyBug = function() {
     var bug;
     bug = Object.create(Bug);
-    bug.speed = 1;
+    bug.speed = 100;
+    bug.points = 10;
+    bug.ratio = 1;
     bug.color = 'green';
     return bug;
   };
@@ -93,7 +206,9 @@
   MediumBug = function() {
     var bug;
     bug = Object.create(Bug);
-    bug.speed = 2;
+    bug.speed = 200;
+    bug.points = 30;
+    bug.ratio = .6;
     bug.color = 'orange';
     return bug;
   };
@@ -101,7 +216,9 @@
   HardBug = function() {
     var bug;
     bug = Object.create(Bug);
-    bug.speed = 3;
+    bug.speed = 300;
+    bug.points = 50;
+    bug.ratio = .3;
     bug.color = 'red';
     return bug;
   };
