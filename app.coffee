@@ -24,7 +24,7 @@ Game =
   top_scores: [
     {name: "JD", score: 123},
     {name: "Ed", score: 178},
-    {name: "Travis", score: 230}
+    {name: "Trevor", score: 230}
   ]
 
 app.get "/", (req, res) ->
