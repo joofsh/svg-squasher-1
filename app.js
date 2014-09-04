@@ -39,13 +39,13 @@
     },
     top_scores: [
       {
-        name: "JD",
+        name: "Bob",
         score: 123
       }, {
-        name: "Ed",
+        name: "Jim",
         score: 178
       }, {
-        name: "Trevor",
+        name: "Scott",
         score: 230
       }
     ]

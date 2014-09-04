@@ -22,9 +22,9 @@ Game =
 
   # Dummy data
   top_scores: [
-    {name: "JD", score: 123},
-    {name: "Ed", score: 178},
-    {name: "Trevor", score: 230}
+    {name: "Bob", score: 123},
+    {name: "Jim", score: 178},
+    {name: "Scott", score: 230}
   ]
 
 app.get "/", (req, res) ->
