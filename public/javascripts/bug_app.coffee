@@ -134,6 +134,8 @@
     else if timer/1000 > 60
       $scope.game.bug_rate = 500
       $scope.set_bug_interval()
+    else
+      $scope.game.bug_rate = 2000
 
   socket.on 'top_scores', (top_scores) ->
     console.log 'top scores received from server'
